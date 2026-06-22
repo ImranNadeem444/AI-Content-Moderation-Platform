@@ -1,321 +1,262 @@
-# AI Content Moderation Platform – Backend
+# AI Content Moderation Platform
 
 ## Overview
 
-The AI Content Moderation Platform is a backend system designed to automate the moderation of user-submitted content using Artificial Intelligence. The platform allows users to upload content, receive moderation verdicts, submit appeals, and enables administrators to review moderation outcomes through analytics and management endpoints.
+AI Content Moderation Platform is a full-stack web application designed to automate content moderation workflows through a centralized management system. The platform enables secure user authentication, content submission, moderation decision tracking, appeals management, policy administration, and analytics reporting.
 
-This project was developed using FastAPI, MongoDB Atlas, JWT Authentication, and a modular backend architecture to demonstrate a scalable content moderation workflow.
+The project demonstrates the design and implementation of a production-oriented moderation system using modern web technologies and RESTful API architecture.
 
 ---
 
-# Features
+## Key Features
 
-## Authentication Module
+### Authentication & Authorization
 
-* User Registration
-* User Login
-* JWT Token Generation
-* Protected Routes
-* Current User Information Endpoint
+* User registration and login
+* JWT-based authentication
+* Protected API endpoints
+* Role-based access support
 
-### Endpoints
+### Content Submission System
 
-```http
-POST /auth/register
-POST /auth/login
-GET  /auth/me
+* Image upload functionality
+* Moderation outcome management
+* Submission history tracking
+* User-specific content records
+
+### Appeals Management
+
+* Create appeals against moderation decisions
+* View personal appeals
+* Administrative appeal review workflow
+* Appeal approval and rejection endpoints
+
+### Verdict Management
+
+* Centralized verdict tracking
+* Administrative override functionality
+* Moderation decision management
+
+### Analytics Dashboard
+
+* Total users statistics
+* Total submissions statistics
+* Approved content metrics
+* Blocked content metrics
+* Appeals statistics
+* Moderation activity insights
+
+### Policy Management
+
+* Moderation policy retrieval
+* Policy update endpoints
+* Configurable moderation categories
+
+### API Documentation
+
+* Interactive Swagger/OpenAPI documentation
+* Structured endpoint organization
+* Request and response validation
+
+---
+
+## System Architecture
+
+```text
+┌─────────────────────┐
+│     React Frontend  │
+└──────────┬──────────┘
+           │ HTTP Requests
+           ▼
+┌─────────────────────┐
+│    FastAPI Backend  │
+└──────────┬──────────┘
+           │
+           ├──────── Authentication
+           ├──────── Submissions
+           ├──────── Appeals
+           ├──────── Verdicts
+           ├──────── Analytics
+           └──────── Policies
+                     │
+                     ▼
+┌─────────────────────┐
+│      MongoDB        │
+└─────────────────────┘
 ```
 
 ---
 
-## Submission Management
+## Application Workflow
 
-Users can upload content for moderation and retrieve their submission history.
-
-### Features
-
-* Secure file upload
-* User-specific submissions
-* Submission storage in MongoDB Atlas
-* Moderation result association
-
-### Endpoints
-
-```http
-GET  /submissions/
-GET  /submissions/my
-GET  /submissions/all
-POST /submissions/upload
+```text
+User Login
+     │
+     ▼
+JWT Authentication
+     │
+     ▼
+Upload Content
+     │
+     ▼
+Moderation Processing
+     │
+     ▼
+Store Results in MongoDB
+     │
+     ▼
+Analytics Dashboard
+     │
+     ▼
+Appeals & Verdict Review
 ```
 
 ---
 
-## AI Moderation Module
+## Project Structure
 
-The moderation service analyzes uploaded content and generates moderation verdicts.
-
-### Current Implementation
-
-* Verdict generation pipeline
-* Category-based moderation results
-* Confidence scores
-* Moderation reasoning
-
-Example:
-
-```json
-{
-  "overall_outcome": "Approved",
-  "categories": [
-    {
-      "category": "Graphic Violence",
-      "result": false,
-      "confidence": 0.05,
-      "reason": "No violence detected"
-    }
-  ]
-}
+```text
+AI-Content-Moderation-Platform
+│
+├── backend
+│   ├── app
+│   │   ├── api
+│   │   ├── auth
+│   │   ├── database
+│   │   ├── schemas
+│   │   └── services
+│   │
+│   └── main.py
+│
+├── frontend
+│   ├── src
+│   │   ├── services
+│   │   ├── components
+│   │   └── App.jsx
+│
+└── README.md
 ```
 
 ---
 
-## Appeals Management
+## Technology Stack
 
-Users can appeal moderation decisions.
+### Frontend
 
-Administrators can review appeals and update their status.
+* React
+* Vite
+* Axios
+* JavaScript
+* CSS
 
-### Features
-
-* Appeal submission
-* Appeal tracking
-* Approval workflow
-* Rejection workflow
-
-### Endpoints
-
-```http
-GET  /appeals/
-POST /appeals/create
-GET  /appeals/my
-GET  /appeals/all
-PUT  /appeals/{appeal_id}/approve
-PUT  /appeals/{appeal_id}/reject
-```
-
----
-
-## Verdict Management
-
-Stores and retrieves moderation outcomes.
-
-### Endpoints
-
-```http
-GET /verdicts/
-GET /verdicts/all
-```
-
----
-
-## Analytics Dashboard
-
-Provides platform statistics for administrators.
-
-### Features
-
-* User statistics
-* Submission statistics
-* Appeal statistics
-* Moderation statistics
-
-### Endpoint
-
-```http
-GET /analytics/dashboard
-```
-
-Example Response:
-
-```json
-{
-  "total_users": 1,
-  "total_submissions": 4,
-  "approved_submissions": 4,
-  "rejected_submissions": 0,
-  "total_appeals": 2,
-  "approved_appeals": 1,
-  "rejected_appeals": 0,
-  "pending_appeals": 1
-}
-```
-
----
-
-# Technology Stack
-
-## Backend Framework
+### Backend
 
 * FastAPI
+* Python
+* JWT Authentication
+* REST API Architecture
 
-## Database
+### Database
 
-* MongoDB Atlas
-* PyMongo
+* MongoDB
 
-## Authentication
-
-* JWT (JSON Web Tokens)
-* Passlib (Bcrypt)
-
-## API Documentation
+### API Documentation
 
 * Swagger UI
-* OpenAPI 3.1
+* OpenAPI
 
-## Additional Libraries
+### Development Tools
 
-* Python Dotenv
-* Python-Jose
-* BSON
-* Uvicorn
+* Git
+* GitHub
+* VS Code
 
 ---
 
-# System Architecture
+## REST API Modules
 
-```text
-+------------------+
-|      Client      |
-+--------+---------+
-         |
-         v
-+------------------+
-|     FastAPI      |
-|   REST APIs      |
-+--------+---------+
-         |
-         v
-+------------------+
-| Authentication   |
-| JWT Validation   |
-+--------+---------+
-         |
-         +-------------------+
-         |                   |
-         v                   v
+### Authentication
 
-+------------------+   +------------------+
-| Moderation       |   | Appeals Module   |
-| Service          |   |                  |
-+--------+---------+   +--------+---------+
-         |                      |
-         +----------+-----------+
-                    |
-                    v
+* POST /auth/register
+* POST /auth/login
+* GET /auth/me
 
-         +------------------+
-         | MongoDB Atlas    |
-         | Database         |
-         +------------------+
+### Submissions
+
+* POST /submissions/upload
+* GET /submissions/my
+* GET /submissions/all
+
+### Appeals
+
+* POST /appeals/create
+* GET /appeals/my
+* GET /appeals/all
+* PUT /appeals/{appeal_id}/approve
+* PUT /appeals/{appeal_id}/reject
+
+### Verdicts
+
+* GET /verdicts/all
+* PUT /verdicts/{submission_id}/override
+
+### Analytics
+
+* GET /analytics/dashboard
+
+### Policies
+
+* GET /policies
+* PUT /policies/{category}
+
+---
+
+## Security Features
+
+* JWT-based authentication
+* Password hashing
+* Protected routes
+* Secure API access control
+* Request validation using FastAPI schemas
+
+---
+
+## Learning Outcomes
+
+This project demonstrates practical experience in:
+
+* Full-stack application development
+* REST API design
+* Authentication and authorization
+* Database integration
+* Frontend-backend communication
+* MongoDB data management
+* FastAPI development
+* React application development
+* Software architecture design
+* API documentation practices
+
+---
+
+## Author
+
+**Imran Nadeem**
+
+BS Computer Science
+National University of Technology (NUTECH)
+
+AI/ML Engineer | Software Developer | LLM & Generative AI Enthusiast
+
+---
+
+## Future Enhancements
+
+* Docker containerization
+* Advanced AI moderation models
+* Real-time notifications
+* Cloud deployment
+* Administrative dashboard enhancements
+* Advanced reporting and analytics
+
 ```
-
----
-
-# Database Collections
-
-```text
-users
-submissions
-appeals
-verdicts
-policies
 ```
-
----
-
-# API Workflow
-
-```text
-User Registration
-        |
-        v
-User Login
-        |
-        v
-JWT Token Issued
-        |
-        v
-Upload Content
-        |
-        v
-AI Moderation
-        |
-        v
-Verdict Generated
-        |
-        v
-Appeal Submission
-        |
-        v
-Admin Review
-        |
-        +------> Approve
-        |
-        +------> Reject
-```
-
----
-
-# Project Structure
-
-```text
-app/
-│
-├── api/
-│   ├── auth.py
-│   ├── submissions.py
-│   ├── appeals.py
-│   ├── verdicts.py
-│   └── analytics.py
-│
-├── auth/
-│   ├── jwt_handler.py
-│   ├── password.py
-│   ├── dependencies.py
-│   └── roles.py
-│
-├── database/
-│   ├── mongodb.py
-│   └── collections.py
-│
-├── schemas/
-│   ├── user.py
-│   ├── auth.py
-│   └── appeal.py
-│
-├── services/
-│   └── moderation_service.py
-│
-└── main.py
-```
-
----
-
-# Future Enhancements
-
-* Deep Learning Moderation Models
-* Real-Time Content Monitoring
-* Policy Management Module
-* Admin Dashboard Frontend
-* Role-Based Access Control
-* Audit Logging
-* Notification System
-* Docker Deployment
-* CI/CD Integration
-
----
-
-# Note
-
-Due to final examination commitments and limited development time, the project scope was focused on completing and demonstrating a fully functional backend system. The implemented backend includes authentication, content submission, moderation workflow, appeals management, verdict retrieval, analytics reporting, and MongoDB Atlas integration, providing a complete foundation for future frontend integration and production-level enhancements.

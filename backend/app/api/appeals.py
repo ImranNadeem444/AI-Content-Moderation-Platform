@@ -11,7 +11,11 @@ from fastapi import (
 from app.auth.dependencies import get_current_user
 
 from app.schemas.appeal import AppealCreate
-from app.database.collections import appeals_collection
+
+from app.database.collections import (
+    appeals_collection,
+    submissions_collection
+)
 
 router = APIRouter(
     prefix="/appeals",
@@ -38,6 +42,7 @@ def create_appeal(
         "email": current_user["email"],
         "reason": appeal.reason,
         "status": "Pending",
+        "admin_response": "",
         "created_at": datetime.utcnow()
     }
 
@@ -75,7 +80,15 @@ def get_my_appeals(
 
 
 @router.get("/all")
-def get_all_appeals():
+def get_all_appeals(
+    current_user=Depends(get_current_user)
+):
+
+    if current_user["role"] != "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="Admin access required"
+        )
 
     appeals = list(
         appeals_collection.find()
@@ -91,25 +104,52 @@ def get_all_appeals():
 
 @router.put("/{appeal_id}/approve")
 def approve_appeal(
-    appeal_id: str
+    appeal_id: str,
+    current_user=Depends(get_current_user)
 ):
 
-    result = appeals_collection.update_one(
+    if current_user["role"] != "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="Admin access required"
+        )
+
+    appeal = appeals_collection.find_one(
+        {
+            "_id": ObjectId(appeal_id)
+        }
+    )
+
+    if not appeal:
+        raise HTTPException(
+            status_code=404,
+            detail="Appeal not found"
+        )
+
+    appeals_collection.update_one(
         {
             "_id": ObjectId(appeal_id)
         },
         {
             "$set": {
-                "status": "Approved"
+                "status": "Approved",
+                "admin_response": "Appeal accepted after review."
             }
         }
     )
 
-    if result.matched_count == 0:
-        raise HTTPException(
-            status_code=404,
-            detail="Appeal not found"
-        )
+    submissions_collection.update_one(
+        {
+            "_id": ObjectId(
+                appeal["submission_id"]
+            )
+        },
+        {
+            "$set": {
+                "outcome": "Approved"
+            }
+        }
+    )
 
     return {
         "message": "Appeal approved"
@@ -118,8 +158,15 @@ def approve_appeal(
 
 @router.put("/{appeal_id}/reject")
 def reject_appeal(
-    appeal_id: str
+    appeal_id: str,
+    current_user=Depends(get_current_user)
 ):
+
+    if current_user["role"] != "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="Admin access required"
+        )
 
     result = appeals_collection.update_one(
         {
@@ -127,7 +174,8 @@ def reject_appeal(
         },
         {
             "$set": {
-                "status": "Rejected"
+                "status": "Rejected",
+                "admin_response": "Appeal rejected after review."
             }
         }
     )

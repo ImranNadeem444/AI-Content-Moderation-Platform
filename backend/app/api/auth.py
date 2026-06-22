@@ -84,6 +84,7 @@ def login(credentials: LoginRequest):
     token = create_access_token(
         {
             "user_id": str(user["_id"]),
+            "name": user.get("name", "Unknown"),
             "email": user["email"],
             "role": user["role"]
         }
@@ -101,6 +102,7 @@ def get_me(
 ):
     return {
         "user_id": current_user["user_id"],
+        "name": current_user.get("name", "Unknown"),
         "email": current_user["email"],
         "role": current_user["role"]
     }

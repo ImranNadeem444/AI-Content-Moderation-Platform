@@ -1,7 +1,18 @@
+# Python
 __pycache__/
 *.pyc
 .env
-venv/
-uploads/
-.idea/
+
+# Node
+node_modules/
+dist/
+
+# VS Code
 .vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Uploads
+uploads/

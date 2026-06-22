@@ -70,35 +70,55 @@ def get_all_submissions():
 
 @router.post("/upload")
 async def upload_image(
-    image: UploadFile = File(...),
+    images: list[UploadFile] = File(...),
     current_user=Depends(get_current_user)
 ):
 
-    file_extension = image.filename.split(".")[-1]
+    image_paths = []
+    verdicts = []
 
-    unique_filename = (
-        f"{uuid.uuid4()}.{file_extension}"
-    )
+    overall_outcome = "Approved"
 
-    file_path = os.path.join(
-        UPLOAD_DIR,
-        unique_filename
-    )
+    for image in images:
 
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(
-            image.file,
-            buffer
+        file_extension = image.filename.split(".")[-1]
+
+        unique_filename = (
+            f"{uuid.uuid4()}.{file_extension}"
         )
 
-    verdict = analyze_image(file_path)
+        file_path = os.path.join(
+            UPLOAD_DIR,
+            unique_filename
+        )
+
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(
+                image.file,
+                buffer
+            )
+
+        verdict = analyze_image(file_path)
+
+        image_paths.append(file_path)
+        verdicts.append(verdict)
+
+        if verdict["overall_outcome"] == "Blocked":
+            overall_outcome = "Blocked"
+
+        elif (
+            verdict["overall_outcome"] == "Flagged"
+            and overall_outcome != "Blocked"
+        ):
+            overall_outcome = "Flagged"
 
     submission = {
         "user_id": current_user["user_id"],
+        "name": current_user.get("name", "Unknown"),
         "email": current_user["email"],
-        "images": [file_path],
-        "outcome": verdict["overall_outcome"],
-        "verdict": verdict,
+        "images": image_paths,
+        "outcome": overall_outcome,
+        "verdicts": verdicts,
         "created_at": datetime.utcnow()
     }
 
@@ -107,9 +127,10 @@ async def upload_image(
     )
 
     return {
-        "message": "Image uploaded successfully",
+        "message": "Images uploaded successfully",
         "submission_id": str(result.inserted_id),
-        "image_path": file_path,
-        "outcome": verdict["overall_outcome"],
+        "images_uploaded": len(image_paths),
+        "image_paths": image_paths,
+        "outcome": overall_outcome,
         "user": current_user["email"]
     }

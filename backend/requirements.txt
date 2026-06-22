@@ -27,3 +27,4 @@ aiofiles==24.1.0
 httpx==0.28.1
 
 python-dateutil==2.9.0.post0
+accelerate==1.8.1
